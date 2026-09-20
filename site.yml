@@ -1,0 +1,6 @@
+---
+- name: Configure the lab web server
+  hosts: webservers
+  become: true
+  roles:
+    - web

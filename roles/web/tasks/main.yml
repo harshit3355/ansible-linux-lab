@@ -1,0 +1,26 @@
+---
+- name: Refresh apt package index
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Install web server and Git
+  ansible.builtin.apt:
+    name:
+      - nginx
+      - git
+    state: present
+
+- name: Publish the lab homepage
+  ansible.builtin.template:
+    src: index.html.j2
+    dest: /var/www/html/index.html
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Ensure Nginx is enabled and running
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: true
