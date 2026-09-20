@@ -1,0 +1,13 @@
+---
+- name: Validate Nginx configuration  # noqa: command-instead-of-module
+  ansible.builtin.command:
+    cmd: nginx -t
+  changed_when: false
+  # nginx -t has no dedicated Ansible module; this check gates the reload.
+  listen: validate-and-reload-nginx
+
+- name: Reload Nginx after a validated configuration change
+  ansible.builtin.service:
+    name: "{{ web_service_name }}"
+    state: reloaded
+  listen: validate-and-reload-nginx

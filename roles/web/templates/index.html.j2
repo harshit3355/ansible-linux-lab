@@ -3,12 +3,12 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Ansible Linux Lab</title>
+    <title>{{ web_page_title | e }}</title>
   </head>
   <body>
     <main>
-      <h1>Ansible Linux Lab is running</h1>
-      <p>This page was deployed by Ansible on {{ inventory_hostname }}.</p>
+      <h1>{{ web_page_heading | e }}</h1>
+      <p>Managed by Ansible. Host: {{ inventory_hostname | e }}.</p>
     </main>
   </body>
 </html>

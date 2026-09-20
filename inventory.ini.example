@@ -1,3 +1,0 @@
-[webservers]
-# Replace the address and username with your managed Debian/Ubuntu VM details.
-web1 ansible_host=192.168.56.20 ansible_user=your_username ansible_ssh_private_key_file=~/.ssh/id_ed25519

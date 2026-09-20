@@ -2,5 +2,46 @@
 - name: Configure the lab web server
   hosts: webservers
   become: true
+  gather_facts: true
+  strategy: linear
+  serial: 10
+  any_errors_fatal: true
+
+  pre_tasks:
+    - name: Verify the target is in the supported Debian family
+      ansible.builtin.assert:
+        that:
+          - ansible_facts.os_family == "Debian"
+        fail_msg: >-
+          This lab role supports Debian-family hosts only. Detected
+          {{ ansible_facts.distribution }} ({{ ansible_facts.os_family }}).
+
+    - name: Validate required web role settings
+      ansible.builtin.assert:
+        that:
+          - web_page_title | length > 0
+          - web_page_heading | length > 0
+          - web_listen_port | int >= 1
+          - web_listen_port | int <= 65535
+        fail_msg: "Set a non-empty title and heading and a valid TCP port."
+
   roles:
     - web
+
+  post_tasks:
+    - name: Verify the homepage responds successfully
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ web_listen_port }}/"
+        method: GET
+        status_code: 200
+        return_content: true
+      register: web_health_check
+      changed_when: false
+      when: not ansible_check_mode
+
+    - name: Confirm the deployed page contains the configured heading
+      ansible.builtin.assert:
+        that:
+          - web_page_heading in web_health_check.content
+        fail_msg: "The HTTP check passed but the expected page heading was not found."
+      when: not ansible_check_mode

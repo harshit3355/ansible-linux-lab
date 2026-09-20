@@ -4,23 +4,53 @@
     update_cache: true
     cache_valid_time: 3600
 
-- name: Install web server and Git
+- name: Install required packages
   ansible.builtin.apt:
-    name:
-      - nginx
-      - git
+    name: "{{ web_packages }}"
     state: present
+
+- name: Create the application document root
+  ansible.builtin.file:
+    path: "{{ web_document_root }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
 
 - name: Publish the lab homepage
   ansible.builtin.template:
     src: index.html.j2
-    dest: /var/www/html/index.html
+    dest: "{{ web_document_root }}/index.html"
     owner: root
     group: root
     mode: "0644"
 
+- name: Install the managed Nginx virtual host
+  ansible.builtin.template:
+    src: nginx-site.conf.j2
+    dest: "{{ web_site_config_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: validate-and-reload-nginx
+
+- name: Remove the distribution default site when present
+  ansible.builtin.file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify: validate-and-reload-nginx
+
+- name: Enable the managed Nginx virtual host
+  ansible.builtin.file:
+    src: "{{ web_site_config_path }}"
+    dest: "{{ web_site_enabled_path }}"
+    state: link
+    owner: root
+    group: root
+  notify: validate-and-reload-nginx
+
 - name: Ensure Nginx is enabled and running
   ansible.builtin.service:
-    name: nginx
+    name: "{{ web_service_name }}"
     state: started
     enabled: true

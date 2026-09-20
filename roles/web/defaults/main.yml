@@ -1,0 +1,13 @@
+---
+# Override defaults through inventory group_vars or host_vars, not task edits.
+web_packages:
+  - nginx
+  - git
+web_service_name: nginx
+web_document_root: /var/www/ansible-linux-lab
+web_site_config_path: /etc/nginx/sites-available/ansible-linux-lab
+web_site_enabled_path: /etc/nginx/sites-enabled/ansible-linux-lab
+web_listen_port: 80
+web_server_name: _
+web_page_title: Ansible Linux Lab
+web_page_heading: Ansible Linux Lab is running

@@ -1,0 +1,13 @@
+---
+# Copy this file to hosts.yml in this directory, then replace example values.
+# Keep credentials and private key material outside inventory files.
+all:
+  children:
+    webservers:
+      hosts:
+        web-01:
+          ansible_host: 10.20.10.11
+          ansible_user: ansible
+        web-02:
+          ansible_host: 10.20.10.12
+          ansible_user: ansible
